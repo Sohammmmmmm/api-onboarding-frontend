@@ -1,5 +1,12 @@
 # React + Vite
 
+## Backend API
+
+The frontend uses `https://43.204.108.73:8348/onboarding/api` by default. To
+override it, set `VITE_API_BASE_URL` in `.env.local`. Mock data is disabled by
+default; set `VITE_USE_MOCK_API=true` to use the local demo store when API calls
+fail. Restart the Vite server after changing either variable.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

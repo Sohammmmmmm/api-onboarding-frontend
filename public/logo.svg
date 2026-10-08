@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 345" width="250" height="345" fill="none">
+  <defs>
+    <linearGradient id="nishkaivGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0877D1" />
+      <stop offset="50%" stop-color="#8A2727" />
+      <stop offset="100%" stop-color="#D32F2F" />
+    </linearGradient>
+  </defs>
+  <g stroke="url(#nishkaivGrad)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M162 15L230 63" />
+    <path d="M230 63L162 110" />
+    <path d="M230 63H90C50 63 25 85 25 120C25 150 45 165 90 172L160 178C205 182 227 198 227 230C227 262 205 280 170 280H22" />
+    <path d="M90 233L22 280" />
+    <path d="M22 280L90 328" />
+  </g>
+</svg>

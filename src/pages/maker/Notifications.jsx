@@ -1,39 +1,52 @@
-import { Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Loader from "../../components/common/Loader";
 import NotificationPanel from "../../components/maker/NotificationPanel";
-import { getNotifications, markNotificationRead } from "../../services/notificationService";
+import {
+  getNotifications,
+  markAllNotificationsRead,
+} from "../../services/notificationService";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     try {
       const response = await getNotifications();
       setNotifications(Array.isArray(response) ? response : response?.content || []);
+      setError("");
     } catch (err) {
       console.error(err);
       setError("Unable to load notifications.");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { loadNotifications(); }, []);
+  useEffect(() => {
+    loadNotifications();
+    const timer = setInterval(loadNotifications, 30000);
+    window.addEventListener("notifications:changed", loadNotifications);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("notifications:changed", loadNotifications);
+    };
+  }, [loadNotifications]);
 
-  const markAllRead = async () => {
+  const handleMarkAll = async () => {
+    setError("");
     try {
-      const unread = notifications.filter((notification) => !notification.read);
-      await Promise.all(unread.map((notification) => markNotificationRead(notification.id)));
-      await loadNotifications();
+      await markAllNotificationsRead();
     } catch (err) {
       console.error(err);
+      setError("Unable to mark notifications as read.");
     }
   };
 
   if (loading) return <Loader />;
+
+  const hasUnread = notifications.some((n) => !n.read);
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-4 sm:space-y-6">
@@ -42,10 +55,12 @@ export default function Notifications() {
           <h1 className="text-xl font-bold text-slate-800 sm:text-2xl">Notifications</h1>
           <p className="mt-1 text-sm text-slate-500">Stay updated about your onboarding requests.</p>
         </div>
-
-        {notifications.some((notification) => !notification.read) && (
-          <button type="button" onClick={markAllRead} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:w-auto">
-            <Check size={16} />
+        {hasUnread && (
+          <button
+            type="button"
+            onClick={handleMarkAll}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+          >
             Mark all as read
           </button>
         )}

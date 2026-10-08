@@ -12,7 +12,12 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #f1f5f9;
+    background:
+    radial-gradient(900px 520px at 6% -8%, rgba(37, 99, 235, 0.25), transparent 60%),
+    radial-gradient(800px 520px at 100% 0%, rgba(147, 51, 234, 0.18), transparent 60%),
+    radial-gradient(800px 560px at 50% 112%, rgba(138, 39, 39, 0.14), transparent 60%),
+    #eaf0f9;
+  background-attachment: fixed;
   font-family:
     Inter,
     ui-sans-serif,
@@ -80,10 +85,341 @@ canvas {
   word-break: break-word;
 }
 
+.brand-mark__stroke {
+  stroke: #8A2727;
+}
+
+.brand-mark__stroke--animated {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: brand-mark-draw 1.3s cubic-bezier(0.56, 0, 0.32, 1) forwards;
+}
+
+.brand-mark__stroke--two {
+  animation-delay: 0.08s;
+}
+
+.brand-mark__stroke--three {
+  animation-delay: 0.16s;
+}
+
+.brand-mark__stroke--four {
+  animation-delay: 1.04s;
+}
+
+.brand-mark__stroke--five {
+  animation-delay: 1.13s;
+}
+
+.brand-loader__mark {
+  position: relative;
+  z-index: 1;
+  width: 1rem;
+  height: 1.4rem;
+}
+
+.brand-loader {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(248, 250, 252, 0.42);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+.brand-loader__content {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+}
+
+.brand-loader__spinner {
+  position: relative;
+  display: grid;
+  width: 4rem;
+  height: 4rem;
+  place-items: center;
+}
+
+.brand-loader__spinner::before {
+  position: absolute;
+  inset: 0;
+  border: 3px solid rgba(138, 39, 39, 0.18);
+  border-top-color: #8a2727;
+  border-radius: 50%;
+  content: "";
+  animation: brand-loader-spin 0.85s linear infinite;
+}
+
+.brand-loader__text {
+  margin: 0;
+  color: #475569;
+  font-size: 0.875rem;
+}
+
+@keyframes brand-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.brand-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 90, 31, 0.24) 0%, rgba(200, 40, 40, 0.08) 45%, transparent 75%),
+    linear-gradient(135deg, #0d121c 0%, #131a27 50%, #1c1417 100%);
+}
+
+.brand-intro::before {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.12) 0.8px, transparent 0.8px);
+  background-size: 32px 32px;
+  content: "";
+  opacity: 0.15;
+}
+
+.brand-intro__glow {
+  position: absolute;
+  width: 26rem;
+  height: 26rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 95, 21, 0.3) 0%, rgba(211, 47, 47, 0.12) 50%, transparent 75%);
+  filter: blur(48px);
+  animation: brand-intro-pulse 3s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes brand-intro-pulse {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.brand-intro__content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.brand-intro__spinner-wrapper {
+  position: relative;
+  width: clamp(14rem, 32vw, 18rem);
+  height: clamp(14rem, 32vw, 18rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-intro__arc-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: brand-intro-spin 1.15s linear infinite;
+  filter: drop-shadow(0 0 14px rgba(255, 110, 0, 0.45));
+}
+
+@keyframes brand-intro-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.brand-intro__logo-container {
+  position: relative;
+  z-index: 2;
+  width: 50%;
+  height: 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 18px rgba(255, 65, 45, 0.35));
+}
+
+.brand-intro__mark {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.brand-intro__mark--img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 16px rgba(255, 65, 45, 0.45));
+}
+
+.brand-intro__text {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.brand-intro__dots {
+  display: inline-block;
+  animation: brand-dots 1.4s infinite steps(4, jump-none);
+}
+
+@keyframes brand-dots {
+  0% { opacity: 0.2; }
+  50% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+@keyframes brand-mark-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes mail-icon-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-2px) rotate(-5deg);
+  }
+}
+
+@keyframes bell-ring {
+  0%, 82%, 100% {
+    transform: rotate(0);
+  }
+  86% {
+    transform: rotate(12deg);
+  }
+  90% {
+    transform: rotate(-10deg);
+  }
+  94% {
+    transform: rotate(6deg);
+  }
+  98% {
+    transform: rotate(-3deg);
+  }
+}
+
+.mail-icon-animation {
+  animation: mail-icon-float 2.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.notification-bell-animation {
+  animation: bell-ring 2.8s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-mark__stroke--animated,
+  .brand-intro__spinner::before,
+  .mail-icon-animation,
+  .notification-bell-animation {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+
+}
+
 @media (max-width: 767px) {
   input,
   select,
   textarea {
     font-size: 16px;
+  }
+}
+/* ===== Glassmorphism ===== */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-bg-strong: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 8px 32px rgba(7, 59, 122, 0.10);
+  --glass-blur: blur(16px) saturate(160%);
+}
+
+/* The layout wrappers use bg-[#f8fafc], which hides the page gradient */
+.bg-\[\#f8fafc\] {
+  background-color: transparent;
+}
+
+/* Reusable classes for anything new */
+.glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Applies glass to your existing components without editing each file */
+header.sticky,
+aside {
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-color: var(--glass-border);
+}
+
+.bg-white.rounded-xl,
+.bg-white.rounded-2xl {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Modals and the login card need to stay readable */
+.fixed .bg-white.rounded-2xl,
+.fixed .bg-white.rounded-xl {
+  background: var(--glass-bg-strong);
+}
+
+/* Fallback for browsers without backdrop-filter, and for reduced transparency */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  header.sticky, aside, .glass, .glass-strong,
+  .bg-white.rounded-xl, .bg-white.rounded-2xl {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  header.sticky, aside, .glass, .glass-strong,
+  .bg-white.rounded-xl, .bg-white.rounded-2xl {
+    background: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }

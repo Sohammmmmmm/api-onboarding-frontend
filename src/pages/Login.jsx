@@ -1,513 +1,185 @@
-import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
 
+import BrandMark, { BrandIntro } from "../components/common/BrandMark";
+import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+
+const getPortalDestination = (role) => {
+  const normalizedRole = String(role || "").toUpperCase().replace(/^ROLE_/, "");
+  const destinations = {
+    MAKER: "/",
+    CHECKER: "/checker",
+    PUBLISHER: "/publisher",
+    ADMIN: "/admin",
+  };
+  return destinations[normalizedRole] || "/login";
+};
+
 export default function Login() {
-  const { authenticated, login } = useAuth();
+  const { authenticated, user, initiateLogin } = useAuth();
+  const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [postLoginDestination, setPostLoginDestination] = useState(null);
 
-  if (authenticated) {
-    return <Navigate to="/" replace />;
-  }
+  useEffect(() => {
+    if (!authenticated) return undefined;
+    if (!postLoginDestination && loading) return undefined;
+    const destination = postLoginDestination || getPortalDestination(user?.role);
+    if (!postLoginDestination) {
+      navigate(destination, { replace: true });
+      return undefined;
+    }
+    const timeoutId = window.setTimeout(() => {
+      navigate(destination, { replace: true });
+    }, 2400);
+    return () => window.clearTimeout(timeoutId);
+  }, [authenticated, user?.role, postLoginDestination, loading, navigate]);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  if (authenticated && postLoginDestination) return <BrandIntro />;
 
+  const handleCredentialsSubmit = async (e) => {
+    e.preventDefault();
     setError("");
 
     if (!username.trim()) {
-      setError("Please enter email or username.");
+      setError("Please enter your email or username.");
       return;
     }
-
     if (!password) {
-      setError("Please enter password.");
+      setError("Please enter your password.");
       return;
     }
 
     setLoading(true);
-
     try {
-      const result = await login(username, password);
-
-      if (!result?.success) {
-        setError(
-          result?.message ||
-            "Invalid email/username or password."
-        );
-
-        setLoading(false);
-        return;
+      const result = await initiateLogin(username.trim(), password, false);
+      if (result.success) {
+        setPostLoginDestination(getPortalDestination(result.user?.role));
+      } else {
+        setError(result.message || "Invalid credentials.");
       }
-
-      window.location.href = "/";
     } catch (err) {
-      console.error("Login error:", err);
-
-      setError("Unable to login. Please try again.");
+      console.error(err);
+      setError("Authentication service error. Please try again.");
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#f8fcff] px-4 py-8 sm:px-6 md:px-8">
+    <div className="relative min-h-screen w-full flex items-center justify-center bg-radial-[at_50%_0%] from-[#e9f2fb] via-[#f1f6fc] to-[#e4eef9] px-4 py-8 overflow-hidden font-sans">
+      {/* Background Decorative Rings & Waves */}
+<div className="pointer-events-none absolute -top-40 -left-40 w-[28rem] h-[28rem] bg-blue-500/30 rounded-full blur-3xl" />
+<div className="pointer-events-none absolute -bottom-40 -right-40 w-[28rem] h-[28rem] bg-indigo-500/25 rounded-full blur-3xl" />
+<div className="pointer-events-none absolute top-1/3 right-1/4 w-72 h-72 bg-[#8A2727]/15 rounded-full blur-3xl" />
 
-      {/* =====================================================
-          TOP LEFT BACKGROUND WAVE
-          ===================================================== */}
-
-      <div className="pointer-events-none absolute -left-20 -top-10 h-[260px] w-[85%] sm:h-[320px] sm:w-[70%] md:-left-16 md:h-[360px] md:w-[65%] lg:h-[400px] lg:w-[60%]">
-        <svg
-          viewBox="0 0 700 300"
-          preserveAspectRatio="none"
-          className="h-full w-full"
-        >
-          <path
-            d="M0 0H700C580 20 530 75 440 105C340 138 285 128 205 92C125 56 75 25 0 20V0Z"
-            fill="#dbeeff"
-          />
-
-          <path
-            d="M0 0H700C580 45 540 100 445 130C345 162 280 150 200 112C120 74 70 38 0 34V0Z"
-            fill="#c5e3ff"
-            opacity="0.65"
-          />
-
-          <path
-            d="M0 0H700C590 70 535 120 445 148C350 178 280 170 195 130C115 92 65 55 0 48V0Z"
-            fill="#b3d9fa"
-            opacity="0.5"
-          />
-        </svg>
-      </div>
-
-      {/* =====================================================
-          BOTTOM RIGHT BACKGROUND WAVE
-          ===================================================== */}
-
-      <div className="pointer-events-none absolute -bottom-10 -right-20 h-[260px] w-[85%] rotate-180 sm:h-[320px] sm:w-[70%] md:h-[360px] md:w-[65%] lg:h-[400px] lg:w-[60%]">
-        <svg
-          viewBox="0 0 700 300"
-          preserveAspectRatio="none"
-          className="h-full w-full"
-        >
-          <path
-            d="M700 300H0C120 280 170 225 260 195C360 162 415 172 495 208C575 244 625 275 700 280V300Z"
-            fill="#dbeeff"
-          />
-
-          <path
-            d="M700 300H0C120 255 160 205 255 175C355 143 420 154 500 192C580 230 630 262 700 266V300Z"
-            fill="#c5e3ff"
-            opacity="0.65"
-          />
-
-          <path
-            d="M700 300H0C110 230 165 180 255 150C350 120 420 135 505 175C585 214 635 250 700 255V300Z"
-            fill="#b3d9fa"
-            opacity="0.5"
-          />
-        </svg>
-      </div>
-
-      {/* =====================================================
-          LOGIN CARD
-          ===================================================== */}
-
-      <div
-        className="
-          relative
-          z-10
-          w-full
-          max-w-[470px]
-          rounded-xl
-          border
-          border-[#e0ebf5]
-          bg-white/95
-          px-8
-          py-8
-          shadow-[0_15px_45px_rgba(40,100,150,0.14),0_3px_10px_rgba(40,100,150,0.06)]
-          sm:px-10
-          sm:py-9
-          md:max-w-[480px]
-          md:px-11
-          md:py-10
-          lg:max-w-[490px]
-        "
-      >
-
-        {/* =================================================
-            GEAR ICON
-            ================================================= */}
-
-        <div
-          className="
-            mx-auto
-            mb-3
-            flex
-            h-14
-            w-14
-            items-center
-            justify-center
-            rounded-full
-            bg-[#e4f3ff]
-            sm:h-16
-            sm:w-16
-          "
-        >
-          <svg
-            width="36"
-            height="36"
-            viewBox="0 0 24 24"
-            fill="none"
-            className="sm:h-10 sm:w-10"
-          >
-            <path
-              d="M19.43 12.98c.04-.32.07-.65.07-.98s-.02-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.37-.31-.6-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98L14.5 2.42C14.47 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.5.42L9.12 5.07c-.61.25-1.18.59-1.69.98l-2.49-1c-.23-.08-.48 0-.6.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.08.65-.08.98s.03.66.08.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.37.31.6.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.61-.25 1.18-.58 1.69-.98l2.49 1c.23.08.48 0 .6-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65Z"
-              fill="#0877d1"
-            />
-
-            <circle
-              cx="12"
-              cy="12"
-              r="3"
-              fill="white"
-            />
-          </svg>
+      {/* Main Container */}
+      <div className="relative z-10 w-full max-w-md">
+        {/* Brand */}
+        <div className="text-center mb-5">
+<div className="glass inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3">
+            <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
+            <span className="text-xs font-semibold tracking-wide text-[#073b7a]">Nishkaiv Solution</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-bold">API PORTAL</span>
+          </div>
         </div>
 
-        {/* =================================================
-            TITLE
-            ================================================= */}
-
-        <h1
-          className="
-            mb-8
-            text-center
-            text-2xl
-            font-bold
-            tracking-[0.3px]
-            text-[#073b7a]
-          "
-        >
-          API ONBOARDING
-        </h1>
-
-        {/* =================================================
-            FORM
-            ================================================= */}
-
-        <form onSubmit={handleSubmit}>
-
-          {/* =================================================
-              USERNAME
-              ================================================= */}
-
-          <div className="mb-5">
-
-            <label
-              htmlFor="username"
-              className="
-                mb-2
-                block
-                text-sm
-                font-semibold
-                text-[#1f2937]
-              "
-            >
-              Email / Username
-            </label>
-
-            <div className="relative">
-
-              {/* User icon */}
-
-              <svg
-                className="
-                  pointer-events-none
-                  absolute
-                  left-3
-                  top-1/2
-                  -translate-y-1/2
-                  text-[#8c9aaa]
-                "
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <path
-                  d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"
-                  fill="currentColor"
-                />
-
-                <path
-                  d="M3 22a9 9 0 0 1 18 0"
-                  fill="currentColor"
-                />
-              </svg>
-
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(event) =>
-                  setUsername(event.target.value)
-                }
-                placeholder="Enter email or username"
-                autoComplete="username"
-                disabled={loading}
-                className="
-                  box-border
-                  h-12
-                  w-full
-                  rounded-md
-                  border
-                  border-[#cbd5e1]
-                  bg-white
-                  pl-10
-                  pr-3
-                  text-sm
-                  text-[#334155]
-                  outline-none
-                  placeholder:text-[#9aa7b5]
-                  focus:border-[#2785d8]
-                  focus:ring-2
-                  focus:ring-[#2785d8]/10
-                  disabled:bg-slate-50
-                "
-              />
-
-            </div>
+        {/* Card */}
+        <div className="glass-strong rounded-2xl p-6 sm:p-8">
+          {/* Header Icon */}
+          <div className="flex justify-center mb-4">
+            <BrandMark className="h-16 w-auto" />
           </div>
 
-          {/* =================================================
-              PASSWORD
-              ================================================= */}
-
-          <div className="mb-5">
-
-            <label
-              htmlFor="password"
-              className="
-                mb-2
-                block
-                text-sm
-                font-semibold
-                text-[#1f2937]
-              "
-            >
-              Password
-            </label>
-
-            <div className="relative">
-
-              {/* Lock icon */}
-
-              <svg
-                className="
-                  pointer-events-none
-                  absolute
-                  left-3
-                  top-1/2
-                  -translate-y-1/2
-                  text-[#8c9aaa]
-                "
-                width="17"
-                height="17"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <rect
-                  x="5"
-                  y="10"
-                  width="14"
-                  height="11"
-                  rx="2"
-                  fill="currentColor"
-                />
-
-                <path
-                  d="M8 10V7a4 4 0 0 1 8 0v3"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-
-              <input
-                id="password"
-                type={
-                  showPassword
-                    ? "text"
-                    : "password"
-                }
-                value={password}
-                onChange={(event) =>
-                  setPassword(event.target.value)
-                }
-                placeholder="Enter password"
-                autoComplete="current-password"
-                disabled={loading}
-                className="
-                  box-border
-                  h-12
-                  w-full
-                  rounded-md
-                  border
-                  border-[#cbd5e1]
-                  bg-white
-                  pl-10
-                  pr-12
-                  text-sm
-                  text-[#334155]
-                  outline-none
-                  placeholder:text-[#9aa7b5]
-                  focus:border-[#2785d8]
-                  focus:ring-2
-                  focus:ring-[#2785d8]/10
-                  disabled:bg-slate-50
-                "
-              />
-
-              {/* Password visibility */}
-
-              <button
-                type="button"
-                onClick={() =>
-                  setShowPassword(
-                    (value) => !value
-                  )
-                }
-                tabIndex="-1"
-                className="
-                  absolute
-                  right-3
-                  top-1/2
-                  flex
-                  h-7
-                  w-7
-                  -translate-y-1/2
-                  items-center
-                  justify-center
-                  rounded
-                  border-0
-                  bg-transparent
-                  p-0
-                  text-[#8996a5]
-                  hover:text-[#426b94]
-                "
-              >
-                {showPassword ? (
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <path
-                      d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                    />
-
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="3"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <path
-                      d="M3 3l18 18"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-
-                    <path
-                      d="M10.6 5.2A9.8 9.8 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-3.2 3.9M6.1 6.2C3.4 8.3 2 12 2 12s3.5 7 10 7c1.5 0 2.8-.3 4-.8"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-
-                    <path
-                      d="M9.9 9.9a3 3 0 0 0 4.2 4.2"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                )}
-              </button>
-
-            </div>
+          <div className="text-center mb-6">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#073b7a]">
+              API ONBOARDING
+            </h1>
+            <p className="mt-1 text-xs text-slate-500">
+              Enterprise API Onboarding & Management Platform
+            </p>
           </div>
-
-          {/* =================================================
-              ERROR
-              ================================================= */}
 
           {error && (
-            <div
-              className="
-                mb-4
-                rounded-md
-                bg-red-50
-                px-3
-                py-2
-                text-xs
-                text-red-700
-              "
-            >
-              {error}
+            <div className="mb-4 rounded-lg bg-rose-50 border border-rose-200 px-3.5 py-2.5 text-xs text-rose-700 flex items-start gap-2">
+              <span className="font-bold text-rose-600 mt-0.5">!</span>
+              <span className="flex-1">{error}</span>
             </div>
           )}
 
-          {/* =================================================
-              LOGIN BUTTON
-              ================================================= */}
+          <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Email / Username
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={17} />
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="e.g. checker@nishkaiv.com or maker@nishkaiv.com"
+                  disabled={loading}
+className="h-11 w-full rounded-lg border border-white/70 bg-white/50 pl-10 pr-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"                />
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="
-              h-12
-              w-full
-              rounded-md
-              border-0
-              bg-[#0875d1]
-              text-sm
-              font-semibold
-              text-white
-              shadow-sm
-              transition
-              duration-150
-              hover:bg-[#0668bc]
-              active:translate-y-px
-              disabled:cursor-not-allowed
-              disabled:opacity-60
-            "
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-[11px] font-medium text-blue-600 hover:text-blue-700"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={17} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter password"
+                  disabled={loading}
+className="h-11 w-full rounded-lg border border-white/70 bg-white/50 pl-10 pr-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"                />
+              </div>
+            </div>
 
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 rounded-lg bg-[#0877d1] hover:bg-[#0764b3] text-white font-semibold text-sm shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-60 cursor-pointer"
+            >
+              {loading ? (
+                <>
+    <Loader2 size={18} className="animate-spin" />
+                  <span>Authenticating...</span>
+                </>
+              ) : (
+                <>
+                  <span>Login</span>
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+
+        </div>
+
+        {/* Footer info */}
+        <p className="mt-4 text-center text-xs text-slate-500">
+          Nishkaiv Solution &bull; Version 1.1 (2026)
+        </p>
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ export default function MakerLayout() {
   };
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#f7f9fc]">
+    <div className="min-h-screen overflow-x-hidden bg-transparent">
       {/* Sidebar */}
       <Sidebar
         onCollapseChange={setSidebarCollapsed}

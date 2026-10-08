@@ -1,5 +1,5 @@
-const KEYCLOAK_URL = "http://localhost:8080";
-const KEYCLOAK_REALM = "api-onboarding";
+const KEYCLOAK_URL = "https://43.204.108.73:8347";
+const KEYCLOAK_REALM = "nishkaiv";
 const KEYCLOAK_CLIENT_ID = "api-onboarding-frontend";
 
 const keycloakConfig = {
@@ -14,4 +14,4 @@ export {
   KEYCLOAK_CLIENT_ID,
 };
 
-export default keycloakConfig;
+export default keycloakConfig;
