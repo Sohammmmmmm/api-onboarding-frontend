@@ -141,7 +141,12 @@ export default function CheckerReviewScreen() {
   const handleApprove = async () => {
     setActionLoading(true);
     try {
-      const approval = await approveRequest(requestId, { remarks: remarks.trim() });
+      const catalogueApiId =
+        catalogueMatch?.id || catalogueMatch?.apiId || catalogueMatch?.catalogueApiId;
+      const approval = await approveRequest(requestId, {
+        remarks: remarks.trim(),
+        ...(catalogueApiId ? { catalogueApiId } : {}),
+      });
       const approvalData = approval?.data?.data ?? approval?.data ?? approval;
       const clientId = approvalData?.clientId ?? approvalData?.subscription?.clientId ?? approvalData?.credentials?.clientId;
       setShowApproveModal(false);

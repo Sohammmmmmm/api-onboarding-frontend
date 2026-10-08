@@ -49,9 +49,14 @@ export const updateAdminUserStatus = async (username, active) => {
   return response.data?.data ?? response.data;
 };
 
-export const updateUserRole = async ({ userId, role }) => {
+export const updateUserRole = async ({ userId, username, role, roles }) => {
   try {
-    const response = await api.post("/admin/users/roles", { userId, role });
+    const body = {};
+    if (username) body.username = username;
+    else if (userId) body.userId = userId;
+    if (Array.isArray(roles)) body.roles = roles;
+    else if (role) body.role = role;
+    const response = await api.post("/admin/users/roles", body);
     return response.data?.data ?? response.data;
   } catch (err) {
     if (!USE_MOCK_API) throw err;

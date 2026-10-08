@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Smartphone, Globe, Plus, Layers, ArrowRight, Eye, CheckCircle2 } from "lucide-react";
 import Loader from "../../components/common/Loader";
 import { getApplications, createApplication } from "../../services/applicationService";
+import { getApplicationTypes } from "../../services/masterService";
+import { getApiErrorMessage } from "../../services/api";
 import AssignApiModal from "../../components/maker/AssignApiModal";
 
 export default function MyApplications() {
@@ -14,7 +16,11 @@ export default function MyApplications() {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newAppName, setNewAppName] = useState("");
-  const [creating, setCreating] = useState("");
+  const [newAppType, setNewAppType] = useState("INTERNAL");
+  const [newAppDescription, setNewAppDescription] = useState("");
+  const [applicationTypes, setApplicationTypes] = useState([]);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
 
   const loadApps = async () => {
     try {
@@ -29,6 +35,20 @@ export default function MyApplications() {
 
   useEffect(() => {
     loadApps();
+    getApplicationTypes()
+      .then((data) => {
+        const types = Array.isArray(data) ? data : data?.values ?? data?.content ?? [];
+        const normalized = types.map((entry) =>
+          typeof entry === "string"
+            ? entry
+            : entry?.code || entry?.value || entry?.name || entry?.id
+        ).filter(Boolean);
+        if (normalized.length > 0) {
+          setApplicationTypes(normalized);
+          setNewAppType(normalized[0]);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const handleOpenAssign = (app) => {
@@ -40,13 +60,20 @@ export default function MyApplications() {
     e.preventDefault();
     if (!newAppName.trim()) return;
     setCreating(true);
+    setCreateError("");
     try {
-      await createApplication({ name: newAppName.trim() });
+      await createApplication({
+        name: newAppName.trim(),
+        applicationType: newAppType,
+        description: newAppDescription.trim() || undefined,
+      });
       setNewAppName("");
+      setNewAppDescription("");
       setShowCreateModal(false);
       await loadApps();
     } catch (err) {
       console.error(err);
+      setCreateError(getApiErrorMessage(err, "Unable to create application."));
     } finally {
       setCreating(false);
     }
@@ -155,6 +182,11 @@ export default function MyApplications() {
           <div className="glass-strong relative w-full max-w-md rounded-2xl p-6 shadow-2xl border border-white">
             <h3 className="text-base font-bold text-slate-900 mb-3">Register New Application</h3>
             <form onSubmit={handleCreateApp} className="space-y-4">
+              {createError && (
+                <p className="text-xs text-red-600 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+                  {createError}
+                </p>
+              )}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Application Name *</label>
                 <input
@@ -164,6 +196,30 @@ export default function MyApplications() {
                   placeholder="e.g. Corporate Web Portal"
                   required
                   className="w-full h-10 rounded-xl border border-slate-300 bg-white px-3 text-xs outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Application Type *</label>
+                <select
+                  value={newAppType}
+                  onChange={(e) => setNewAppType(e.target.value)}
+                  className="w-full h-10 rounded-xl border border-slate-300 bg-white px-3 text-xs outline-none focus:border-blue-500"
+                >
+                  {(applicationTypes.length ? applicationTypes : ["INTERNAL", "EXTERNAL"]).map((type) => (
+                    <option key={type} value={type}>
+                      {String(type).replaceAll("_", " ")}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Description</label>
+                <textarea
+                  value={newAppDescription}
+                  onChange={(e) => setNewAppDescription(e.target.value)}
+                  rows={2}
+                  placeholder="Optional description"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs outline-none focus:border-blue-500 resize-none"
                 />
               </div>
               <div className="flex justify-end gap-2">

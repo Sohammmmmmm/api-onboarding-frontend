@@ -31,8 +31,11 @@ const normalizeDashboard = (d = {}) => ({
  */
 export const getCheckerRequests = async (filters = {}) => {
   try {
-    // Backend defaults to status=PENDING_REVIEW and caps size at 100.
-    const base = { status: "ALL", size: 100, ...filters };
+    const base = {
+      size: 100,
+      ...filters,
+      status: filters.status ?? "PENDING_CHECKER",
+    };
     const rows = [];
     let page = 0;
     let totalPages = 1;
@@ -128,9 +131,14 @@ export const registerRequestApi = async (requestId, apiDetails) => {
 /**
  * Approve request (generates client ID and updates status to SUBSCRIBED).
  */
-export const approveRequest = async (requestId, { remarks } = {}) => {
+export const approveRequest = async (requestId, { remarks, catalogueApiId } = {}) => {
   try {
-    const response = await api.post(`/checker/requests/${encodeURIComponent(requestId)}/approve`, { remarks });
+    const body = { remarks };
+    if (catalogueApiId) body.catalogueApiId = catalogueApiId;
+    const response = await api.post(
+      `/checker/requests/${encodeURIComponent(requestId)}/approve`,
+      body
+    );
     return response.data;
   } catch (err) {
     if (!USE_MOCK_API) throw err;

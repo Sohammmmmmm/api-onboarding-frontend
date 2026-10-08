@@ -19,6 +19,8 @@ import ApiRequestForm from "./pages/maker/ApiRequestForm";
 import RequestDetails from "./pages/maker/RequestDetails";
 import Subscriptions from "./pages/maker/Subscriptions";
 import Notifications from "./pages/maker/Notifications";
+import MyApplications from "./pages/maker/MyApplications";
+import ApplicationDetails from "./pages/maker/ApplicationDetails";
 
 // Checker Pages
 import CheckerDashboard from "./pages/checker/CheckerDashboard";
@@ -97,6 +99,7 @@ export default function App() {
         <Route path="pending-publication" element={<PendingPublication />} />
         <Route path="published" element={<PublishedApis />} />
         <Route path="apis/:apiId" element={<PublisherApiDetails />} />
+        <Route path="catalogue" element={<ApiCatalogue />} />
       </Route>
 
       {/* ADMIN PORTAL ROUTES */}
@@ -131,6 +134,8 @@ export default function App() {
         <Route path="/requests" element={<MakerDashboard />} />
         <Route path="/requests/new" element={<ApiRequestForm />} />
         <Route path="/requests/:requestId" element={<RequestDetails />} />
+        <Route path="/applications" element={<MyApplications />} />
+        <Route path="/applications/:applicationId" element={<ApplicationDetails />} />
         <Route path="/catalogue" element={<ApiCatalogue />} />
         <Route path="/subscriptions" element={<Subscriptions />} />
         <Route path="/notifications" element={<Notifications />} />

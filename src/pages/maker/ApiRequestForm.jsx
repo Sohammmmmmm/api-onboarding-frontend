@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { createOnboardingRequest } from "../../services/onboardingService";
+import { getApiErrorMessage } from "../../services/api";
 import { getEnvironments } from "../../services/masterService";
 
 const fieldClass =
@@ -291,20 +292,7 @@ export default function ApiRequestForm() {
                 err
             );
 
-            const backendMessage =
-                err?.response?.data?.message ||
-                err?.response?.data?.error ||
-                err?.response?.data?.details;
-
-            if (backendMessage) {
-                setError(backendMessage);
-            } else if (err?.message) {
-                setError(err.message);
-            } else {
-                setError(
-                    "Unable to submit API request."
-                );
-            }
+            setError(getApiErrorMessage(err, "Unable to submit API request."));
         } finally {
             setLoading(false);
         }

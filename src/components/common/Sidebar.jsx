@@ -46,19 +46,24 @@ export default function Sidebar({
       icon: <LayoutDashboard size={19} />,
     },
     {
+      label: "Requests",
+      path: "/requests",
+      icon: <ClipboardList size={19} />,
+    },
+    {
       label: "New Request",
       path: "/requests/new",
       icon: <FilePlus size={19} />,
     },
     {
-      label: "My Subscriptions",
-      path: "/subscriptions",
-      icon: <KeyRound size={19} />,
+      label: "Applications",
+      path: "/applications",
+      icon: <Layers size={19} />,
     },
     {
-      label: "Notifications",
-      path: "/notifications",
-      icon: <Bell size={19} />,
+      label: "Subscriptions",
+      path: "/subscriptions",
+      icon: <KeyRound size={19} />,
     },
   ];
 
@@ -69,6 +74,11 @@ export default function Sidebar({
       icon: <LayoutDashboard size={19} />,
     },
     {
+      label: "Request Review",
+      path: "/checker/requests",
+      icon: <ClipboardList size={19} />,
+    },
+    {
       label: "API Inventory",
       path: "/checker/catalogue",
       icon: <Layers size={19} />,
@@ -77,11 +87,6 @@ export default function Sidebar({
       label: "Clarifications",
       path: "/checker/clarifications",
       icon: <MessageSquare size={19} />,
-    },
-    {
-      label: "Notifications",
-      path: "/checker/notifications",
-      icon: <Bell size={19} />,
     },
   ];
 
@@ -100,6 +105,11 @@ export default function Sidebar({
       label: "Published APIs",
       path: "/publisher/published",
       icon: <Layers size={19} />,
+    },
+    {
+      label: "API Inventory",
+      path: "/publisher/catalogue",
+      icon: <BookOpen size={19} />,
     },
   ];
 

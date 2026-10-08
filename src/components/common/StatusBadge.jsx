@@ -49,6 +49,41 @@ const STATUS_CONFIG = {
     dot: "bg-rose-500",
     label: "Rejected",
   },
+  PENDING_CHECKER: {
+    bg: "bg-amber-50 text-amber-800 border-amber-200",
+    dot: "bg-amber-500",
+    label: "Pending Checker",
+  },
+  DRAFT: {
+    bg: "bg-slate-50 text-slate-700 border-slate-200",
+    dot: "bg-slate-400",
+    label: "Draft",
+  },
+  PENDING_PUBLICATION: {
+    bg: "bg-violet-50 text-violet-700 border-violet-200",
+    dot: "bg-violet-500",
+    label: "Pending Publication",
+  },
+  PUBLISHED: {
+    bg: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    dot: "bg-emerald-500",
+    label: "Published",
+  },
+  DEPRECATED: {
+    bg: "bg-orange-50 text-orange-800 border-orange-200",
+    dot: "bg-orange-500",
+    label: "Deprecated",
+  },
+  RETIRED: {
+    bg: "bg-slate-100 text-slate-600 border-slate-300",
+    dot: "bg-slate-500",
+    label: "Retired",
+  },
+  RETURNED: {
+    bg: "bg-amber-50 text-amber-800 border-amber-200",
+    dot: "bg-amber-500",
+    label: "Sent Back",
+  },
 };
 
 export default function StatusBadge({ status, size = "md" }) {

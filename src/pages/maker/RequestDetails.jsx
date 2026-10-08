@@ -9,6 +9,7 @@ import {
   getRequestTimeline,
   sendClarification,
 } from "../../services/onboardingService";
+import { getApiErrorMessage } from "../../services/api";
 
 export default function RequestDetails() {
   const { requestId } = useParams();
@@ -57,7 +58,7 @@ export default function RequestDetails() {
       await loadRequest();
     } catch (err) {
       console.error(err);
-      setError("Unable to submit clarification. Please try again.");
+      setError(getApiErrorMessage(err, "Unable to submit clarification. Please try again."));
     } finally {
       setSending(false);
     }

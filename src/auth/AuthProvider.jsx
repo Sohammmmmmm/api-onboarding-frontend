@@ -14,6 +14,7 @@ import {
   KEYCLOAK_REALM,
   KEYCLOAK_CLIENT_ID,
 } from "./keycloak";
+import { registerAuthSessionHandlers } from "./authSessionBridge";
 
 const AuthContext = createContext(null);
 
@@ -206,6 +207,13 @@ export function AuthProvider({ children }) {
 
     return refreshInFlight.current;
   }, [applyTokens]);
+
+  useEffect(() => {
+    registerAuthSessionHandlers({
+      refresh: refreshSession,
+      clear: clearSession,
+    });
+  }, [refreshSession, clearSession]);
 
   /* ---- Restore an existing session on page load ------------------------- */
   useEffect(() => {

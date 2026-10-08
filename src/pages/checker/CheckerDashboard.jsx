@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import StatusBadge from "../../components/common/StatusBadge";
 import RequestSourceBadge from "../../components/common/RequestSourceBadge";
-import { getCheckerRequests } from "../../services/checkerService";
+import { getCheckerDashboard, getCheckerRequests } from "../../services/checkerService";
 
 const createDefaultFilters = (view) => ({
   provider: "ALL",
@@ -36,7 +36,9 @@ const isClarificationItem = (r) =>
 const matchesRequestGroup = (request, group) => {
   const status = normalizeStatus(request.status);
   if (group === "new") return ["RECEIVED", "AI_ANALYZED"].includes(status);
-  if (group === "pending") return ["PENDING_REVIEW", "UNDER_REVIEW"].includes(status) && !isMakerReplied(request);
+  if (group === "pending") {
+    return ["PENDING_CHECKER", "PENDING_REVIEW", "UNDER_REVIEW"].includes(status) && !isMakerReplied(request);
+  }
   if (group === "clarification") return isClarificationItem(request);
   if (group === "approved") return ["APPROVED", "SUBSCRIBED"].includes(status);
   if (group === "rejected") return status === "REJECTED";
@@ -82,10 +84,24 @@ export default function CheckerDashboard({ view = "dashboard" }) {
   const loadData = async () => {
     setLoading(true);
     try {
-      const reqsData = await getCheckerRequests();
+      const [dashData, reqsData] = await Promise.all([
+        getCheckerDashboard().catch(() => null),
+        getCheckerRequests({ status: "ALL" }),
+      ]);
       if (reqsData) {
         setRequests(reqsData);
-        setDashboard(getDashboardSummary(reqsData));
+        if (dashData && typeof dashData === "object") {
+          setDashboard({
+            pendingReview: dashData.pendingReview ?? dashData.newRequests ?? 0,
+            clarification:
+              dashData.clarification ?? dashData.clarificationRequired ?? 0,
+            approved: (dashData.approved ?? 0) + (dashData.subscribed ?? 0),
+            rejected: dashData.rejected ?? 0,
+            totalRequests: dashData.totalRequests ?? reqsData.length,
+          });
+        } else {
+          setDashboard(getDashboardSummary(reqsData));
+        }
       }
     } catch (e) {
       console.error("Failed to load checker dashboard data:", e);
@@ -135,6 +151,7 @@ export default function CheckerDashboard({ view = "dashboard" }) {
 
   const statuses = [
     "ALL",
+    "PENDING_CHECKER",
     "PENDING_REVIEW",
     "CLARIFICATION_REQUIRED",
     "UNDER_REVIEW",
@@ -148,7 +165,7 @@ export default function CheckerDashboard({ view = "dashboard" }) {
     return requests.filter((r) => {
       const status = normalizeStatus(r.status);
       if (selectedGroup && !matchesRequestGroup(r, selectedGroup)) return false;
-      if (view === "queue" && !["PENDING_REVIEW", "UNDER_REVIEW"].includes(status)) {
+      if (view === "queue" && !["PENDING_CHECKER", "PENDING_REVIEW", "UNDER_REVIEW"].includes(status)) {
         return false;
       }
       if (view === "clarifications" && !isClarificationItem(r)) {
