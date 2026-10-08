@@ -1,11 +1,13 @@
 export default function BrandMark({
   className = "",
   animated = false,
-  src = "/logo.svg",
+  src,
 }) {
+  const logoSrc = src || `${import.meta.env.BASE_URL}logo.svg`;
+
   return (
     <img
-      src={src}
+      src={logoSrc}
       alt="Nishkaiv Solution logo"
       className={`object-contain ${className}`}
       style={{ display: "block" }}
@@ -14,6 +16,8 @@ export default function BrandMark({
 }
 
 export function BrandIntro() {
+  const logoSrc = `${import.meta.env.BASE_URL}logo.svg`;
+
   return (
     <div
       className="brand-intro"
@@ -25,7 +29,7 @@ export function BrandIntro() {
       <div className="brand-intro__glow" aria-hidden="true" />
 
       <div className="brand-intro__content">
-        {/* Swiggy-Style Outer Spinner + Inner Nishkaiv Logo */}
+        {/* Outer Spinner + Inner Nishkaiv Logo */}
         <div className="brand-intro__spinner-wrapper">
           <svg
             className="brand-intro__arc-ring"
@@ -35,7 +39,13 @@ export function BrandIntro() {
             aria-hidden="true"
           >
             <defs>
-              <linearGradient id="swiggyArcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient
+                id="swiggyArcGrad"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
                 <stop offset="0%" stopColor="#FF7A00" />
                 <stop offset="50%" stopColor="#FF4D00" />
                 <stop offset="100%" stopColor="#D32F2F" />
@@ -51,7 +61,7 @@ export function BrandIntro() {
               strokeWidth="4"
             />
 
-            {/* Glowing active arc sweeping around top right */}
+            {/* Active arc */}
             <path
               d="M 110 14 A 96 96 0 0 1 206 110"
               stroke="url(#swiggyArcGrad)"
@@ -60,10 +70,10 @@ export function BrandIntro() {
             />
           </svg>
 
-          {/* Centered Big Nishkaiv Logo using /logo.svg */}
+          {/* Nishkaiv Logo */}
           <div className="brand-intro__logo-container">
             <img
-              src="/logo.svg"
+              src={logoSrc}
               alt="Nishkaiv Solution Logo"
               className="brand-intro__mark brand-intro__mark--img"
             />
@@ -77,4 +87,4 @@ export function BrandIntro() {
       </div>
     </div>
   );
-}
+}
